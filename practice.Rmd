@@ -1,0 +1,77 @@
+---
+title: "Mice Protein Expression Data from Kaggle"
+output: 
+  html_document: 
+    keep_md: yes
+date: "2023-07-08"
+---
+
+```{r}
+getwd()
+```
+```{r}
+mice_data <- readr::read_csv("Data_Cortex_Nuclear.csv")
+```
+```{r}
+library(tidyverse)
+library(janitor)
+library(skimr)
+```
+
+```{r}
+mice_data_clean <- janitor::clean_names(mice_data)
+mice_data_clean
+```
+
+```{r}
+names(mice_data_clean) = gsub(pattern = "_n", replacement = "", x = names(mice_data_clean))
+mice_data_clean
+```
+#NA's?
+```{r}
+anyNA(mice_data_clean) 
+```
+```{r}
+is.na(mice_data_clean)
+```
+#^ That didn't show where the NAs occur. Take a look at the data itself, it's not complete for subjects 3426_13, 3426_14, and 3426_15. 
+
+#Looking at classes of data
+```{r}
+mice_data_clean$genotype <- as.character(mice_data_clean$genotype)
+mice_data_clean$treatment <- as.character(mice_data_clean$treatment)
+mice_data_clean$behavior <- as.character(mice_data_clean$behavior)
+mice_data_clean$class <- as.character(mice_data_clean$class)
+mice_data_clean
+```
+
+#Practice pivoting longer 
+```{r}
+#mice_data_long <- mice_data_clean %>% 
+  #pivot_longer(!mouse_id, names_to = "protein", values_to = "count") %>% 
+ # group_by(mouse_id) 
+#mice_data_long
+```
+#Try finding out some statistics about the level of expression of the proteins.
+```{r}
+#mice_data_long %>%
+  #group_by(protein) %>%
+  #summarize(mean_expression=mean(count, na.rm=T)) %>% 
+  #arrange(desc(mean_expression))
+```
+#The protein nr2a is the most expressed in these mice. 
+
+#Let's go back to the mice_data_clean (the wide version of the data) to investigate genotype, treatment, behavior, and class. Which protein is expressed the most in each combination of subject type (genotype, treatment, behavior, class)?
+```{r}
+#Genotype: control (c) or trisomy (t)
+#Treatment type: memantine (m) or saline (s)
+#Behavior: context-shock (CS) or shock-context (SC)
+#Class: c-CS-s, c-CS-m, c-SC-s, c-SC-m, t-CS-s, t-CS-m, t-SC-s, t-SC-m
+mice_data_clean %>%
+  filter(genotype=="c", treatment=="m", behavior=="cs", class=="c-CS-s")
+```
+
+```{r}
+mice_data_clean
+```
+
